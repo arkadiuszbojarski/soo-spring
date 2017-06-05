@@ -23,6 +23,15 @@ import org.springframework.web.filter.GenericFilterBean;
  *
  */
 public class AuthenticationFilter extends GenericFilterBean {
+	
+	private final TokenAuthenticationService service;
+	
+	/**
+	 * @param tokenAuthenticationService
+	 */
+	public AuthenticationFilter(TokenAuthenticationService tokenAuthenticationService) {
+		this.service = tokenAuthenticationService;
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -33,7 +42,7 @@ public class AuthenticationFilter extends GenericFilterBean {
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain filter)
 			throws IOException, ServletException {
-		Authentication authentication = TokenAuthenticationService.getAuthentication((HttpServletRequest) request);
+		Authentication authentication = service.getAuthentication((HttpServletRequest) request);
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 		filter.doFilter(request, response);
 	}

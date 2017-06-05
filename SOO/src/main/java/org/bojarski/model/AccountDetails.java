@@ -13,7 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
  * @author Arkadiusz Bojarski
  *
  */
-public class CurrentUser implements UserDetails {
+public class AccountDetails implements UserDetails {
 
 	/**
 	 * 
@@ -25,7 +25,7 @@ public class CurrentUser implements UserDetails {
 	/**
 	 * @param user
 	 */
-	public CurrentUser(User user) {
+	public AccountDetails(User user) {
 		this.user = user;
 	}
 
@@ -84,5 +84,4 @@ public class CurrentUser implements UserDetails {
 	public boolean isEnabled() {
 		return true;
 	}
-
 }

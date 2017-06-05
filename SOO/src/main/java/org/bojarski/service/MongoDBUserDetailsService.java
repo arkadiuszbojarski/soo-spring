@@ -5,26 +5,29 @@ package org.bojarski.service;
 
 import java.util.Optional;
 
-import org.bojarski.model.CurrentUser;
+import org.bojarski.model.AccountDetails;
 import org.bojarski.model.User;
 import org.bojarski.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 /**
  * @author Arkadiusz Bojarski
  *
  */
-@Component
-public class CurrentUserDetailsService implements UserDetailsService {
+@Service
+public class MongoDBUserDetailsService implements UserDetailsService {
 
-	UserRepository repository;
+	private final UserRepository repository;
 
+	/**
+	 * @param repository
+	 */
 	@Autowired
-	public CurrentUserDetailsService(UserRepository repository) {
+	public MongoDBUserDetailsService(UserRepository repository) {
 		this.repository = repository;
 	}
 
@@ -36,10 +39,8 @@ public class CurrentUserDetailsService implements UserDetailsService {
 	 */
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		
 		User user = Optional.ofNullable(repository.findOneByName(username))
 				.orElseThrow(() -> new UsernameNotFoundException(username));	
-		return new CurrentUser(user);
+		return new AccountDetails(user);
 	}
-
 }

@@ -14,16 +14,14 @@ import org.springframework.stereotype.Service;
  * @author Arkadiusz Bojarski
  *
  */
-
 @Service
-
-public class DefaultSignupService implements SignupService {
+public class MongoDBSignupService implements SignupService {
 
 	private final UserRepository repository;
 	private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
 	@Autowired
-	public DefaultSignupService(UserRepository repository) {
+	public MongoDBSignupService(UserRepository repository) {
 		this.repository = repository;
 	}
 
@@ -34,5 +32,4 @@ public class DefaultSignupService implements SignupService {
 		user.setPassword(encoder.encode(credentials.getPassword()));
 		return repository.save(user) != null;
 	}
-
 }

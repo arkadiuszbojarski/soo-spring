@@ -14,7 +14,6 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -51,8 +50,7 @@ public class Offer {
 	@Length(max = MAX_FIELD_LENGTH_500)
 	private String comment;
 
-	@DBRef
-	private Company recipient;
+	private String recipient;
 
 	@CreatedDate
 	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE)

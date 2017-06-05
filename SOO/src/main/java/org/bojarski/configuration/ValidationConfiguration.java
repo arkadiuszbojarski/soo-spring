@@ -19,9 +19,17 @@ import org.springframework.validation.Validator;
 @Configuration
 public class ValidationConfiguration extends RepositoryRestConfigurerAdapter {
 
-	@Autowired
 	@Qualifier("jsr303Validator")
-	private Validator validator;
+	private final Validator validator;
+	
+	/**
+	 * 
+	 * @param validator
+	 */
+	@Autowired
+	public ValidationConfiguration(Validator validator) {
+		this.validator = validator;
+	}
 
 	/*
 	 * (non-Javadoc)

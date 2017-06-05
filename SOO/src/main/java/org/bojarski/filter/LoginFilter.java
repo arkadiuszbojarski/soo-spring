@@ -29,6 +29,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class LoginFilter extends AbstractAuthenticationProcessingFilter {
 
+	private final TokenAuthenticationService service;
+
 	/**
 	 * Konstruktor zapamiętujący podane parametry.
 	 * 
@@ -38,10 +40,13 @@ public class LoginFilter extends AbstractAuthenticationProcessingFilter {
 	 * @param authenticationManager
 	 *            {@link AuthenticationManager} obsługujący właściwą walidację
 	 *            danych uwierzytelniających.
+	 * @param tokenAuthenticationService
 	 */
-	public LoginFilter(String url, AuthenticationManager authenticationManager) {
+	public LoginFilter(String url, AuthenticationManager authenticationManager,
+			TokenAuthenticationService tokenAuthenticationService) {
 		super(new AntPathRequestMatcher(url));
 		setAuthenticationManager(authenticationManager);
+		this.service = tokenAuthenticationService;
 	}
 
 	/*
@@ -70,8 +75,8 @@ public class LoginFilter extends AbstractAuthenticationProcessingFilter {
 	 * org.springframework.security.core.Authentication)
 	 */
 	@Override
-	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
+	public void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
 			Authentication authResult) throws IOException, ServletException {
-		TokenAuthenticationService.addAuthentication(response, authResult.getName());
+		service.addAuthentication(response, authResult.getName());
 	}
 }
