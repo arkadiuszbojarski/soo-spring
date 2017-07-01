@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 /**
- * Klasa obiektu domeny: konto użytkownika.
+ * Class modeling user account.
  * 
  * @author Arkadiusz Bojarski
  *

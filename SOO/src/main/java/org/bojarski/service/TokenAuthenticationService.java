@@ -3,17 +3,27 @@
  */
 package org.bojarski.service;
 
+import java.io.IOException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
+import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.bojarski.model.User;
-import org.bojarski.repository.UserRepository;
+import org.bojarski.Constants;
+import org.bojarski.configuration.Settings;
+import org.bojarski.model.AuthenticationToken;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
@@ -23,36 +33,42 @@ import io.jsonwebtoken.SignatureAlgorithm;
  */
 @Service
 public class TokenAuthenticationService {
-
-	private static final String SECRET = "secret";
-	private static final String PREFIX = "JWT";
-	private static final String RESPONSE_HEADER = "X-Auth-Token";
-	private static final String AUTHORIZATION_HEADER = "Authorization";
 	
-	private final UserRepository repository;
+	private final Settings settings;
 	
-	/**
-	 * @param repository
-	 */
-	public TokenAuthenticationService(UserRepository repository) {
-		this.repository = repository;
+	@Autowired
+	public TokenAuthenticationService(Settings settings) {
+		this.settings = settings;
 	}
 
-	public void addAuthentication(HttpServletResponse response, String username) {
-		String JWT = Jwts.builder().setSubject(username).signWith(SignatureAlgorithm.HS512, SECRET).compact();
-		response.addHeader(RESPONSE_HEADER, new StringBuilder().append(PREFIX).append(' ').append(JWT.toString()).toString());
+	public void addAuthentication(HttpServletResponse response, Authentication authentication) throws JsonProcessingException, IOException {
+		Instant current = Instant.now();
+		
+		String JWT = Jwts.builder()
+				.setSubject(authentication.getName())
+				.setIssuedAt(Date.from(current))
+				.setExpiration(Date.from(current.plus(settings.getTokenExpirationTime(), ChronoUnit.MINUTES)))
+				.signWith(SignatureAlgorithm.HS512, settings.getTokenSigningKey())
+			.compact();
+		
+		AuthenticationToken token = new AuthenticationToken();
+		token.setAccess_token(JWT);
+		token.setToken_type(Constants.BEARER);
+		
+		ObjectMapper mapper = new ObjectMapper();
+
+		response.setHeader(Constants.CONTENT_TYPE_HEADER, Constants.CONTENT_TYPE_JSON);
+		response.getWriter().write(mapper.writeValueAsString(token));
 	}
 
 	public Authentication getAuthentication(HttpServletRequest request) {
-		String token = request.getHeader(AUTHORIZATION_HEADER);
-		if (token != null) {
-			String user = Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token.replaceAll(PREFIX, "")).getBody().getSubject();
-			if (user != null) {
-				final User retreived = repository.findOneByName(user);
-				if(retreived != null) {
-					return new UsernamePasswordAuthenticationToken(retreived.getName(), null, Collections.emptyList());
-				}
-			}
+		String payload = request.getHeader(Constants.SECURITY_AUTHORIZATION_HEADER);
+		if (payload != null) {
+			Claims claims = Jwts.parser()
+					.setSigningKey(settings.getTokenSigningKey())
+					.parseClaimsJws(payload.replaceAll(Constants.SECURITY_PREFIX, ""))
+				.getBody();
+			return new UsernamePasswordAuthenticationToken(claims.getSubject(), null, Collections.emptyList());	
 		}
 		return null;
 	}

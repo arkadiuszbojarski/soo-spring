@@ -3,6 +3,11 @@ package org.bojarski;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+/**
+ * 
+ * @author Arkadiusz Bojarski
+ *
+ */
 @SpringBootApplication
 public class SooApplication {
 

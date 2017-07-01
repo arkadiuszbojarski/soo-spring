@@ -13,7 +13,7 @@ import org.hibernate.validator.constraints.Range;
 import lombok.Data;
 
 /**
- * Klasa dziedziny modelująca ilość.
+ * Domain class modeling amount.
  * 
  * @author Arkadiusz Bojarski
  *

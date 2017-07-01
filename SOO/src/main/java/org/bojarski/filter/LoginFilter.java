@@ -22,7 +22,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * Klasa bezstanowego filtru logowania.
+ * Statless login filter class.
  * 
  * @author Arkadiusz Bojarski
  *
@@ -32,15 +32,15 @@ public class LoginFilter extends AbstractAuthenticationProcessingFilter {
 	private final TokenAuthenticationService service;
 
 	/**
-	 * Konstruktor zapamiętujący podane parametry.
 	 * 
 	 * @param url
-	 *            napis stanowiący adres pod którym aplikacja będzie oczekiwać
-	 *            na zapytania zawierające dane uwierzytelniające.
+	 *            string representing addres on with application will avait for
+	 *            login attempts.
 	 * @param authenticationManager
-	 *            {@link AuthenticationManager} obsługujący właściwą walidację
-	 *            danych uwierzytelniających.
+	 *            {@link AuthenticationManager} handling user authentication.
 	 * @param tokenAuthenticationService
+	 *            {@link TokenAuthenticationService} handling comparing user
+	 *            data from token.
 	 */
 	public LoginFilter(String url, AuthenticationManager authenticationManager,
 			TokenAuthenticationService tokenAuthenticationService) {
@@ -60,9 +60,8 @@ public class LoginFilter extends AbstractAuthenticationProcessingFilter {
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
 			throws AuthenticationException, IOException, ServletException {
 		final Credentials login = new ObjectMapper().readValue(request.getInputStream(), Credentials.class);
-
-		return getAuthenticationManager()
-				.authenticate(new UsernamePasswordAuthenticationToken(login.getName(), login.getPassword()));
+		final Authentication authentication = new UsernamePasswordAuthenticationToken(login.getName(), login.getPassword());
+		return getAuthenticationManager().authenticate(authentication);
 	}
 
 	/*
@@ -77,6 +76,6 @@ public class LoginFilter extends AbstractAuthenticationProcessingFilter {
 	@Override
 	public void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
 			Authentication authResult) throws IOException, ServletException {
-		service.addAuthentication(response, authResult.getName());
+		service.addAuthentication(response, authResult);
 	}
 }

@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import lombok.Data;
 
 /**
+ * Domain class modeling company.
  * @author Arkadiusz Bojarski
  *
  */
