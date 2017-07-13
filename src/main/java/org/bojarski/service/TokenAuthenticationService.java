@@ -47,7 +47,6 @@ public class TokenAuthenticationService {
 		String JWT = Jwts.builder()
 				.setSubject(authentication.getName())
 				.setIssuedAt(Date.from(current))
-				.setExpiration(Date.from(current.plus(settings.getTokenExpirationTime(), ChronoUnit.MINUTES)))
 				.signWith(SignatureAlgorithm.HS512, settings.getTokenSigningKey())
 			.compact();
 		
