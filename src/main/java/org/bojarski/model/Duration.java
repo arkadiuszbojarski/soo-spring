@@ -13,9 +13,6 @@ import lombok.Data;
  */
 @Data
 public class Duration {
-
-	@Range(min = 0)
-	private int months;
 	
 	@Range(min = 0)
 	private int days;
